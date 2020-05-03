@@ -19,7 +19,9 @@ def sendtofile(cols):
     if not os.path.exists(colpath):
         os.makedirs(colpath)
     for i in cols:
-        df[df[colpick] == i].to_excel(
+        tempDf = df[df[colpick] == i]
+        tempDf = tempDf.drop(colpick, axis=1)
+        tempDf.to_excel(
             "{}/{}.xlsx".format(colpath, i), sheet_name=i, index=False)
     print('\nCompleted')
     print('Thanks for using this program.')
