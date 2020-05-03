@@ -4,21 +4,27 @@ from openpyxl import load_workbook
 import xlsxwriter
 from shutil import copyfile
 
-file=input('File Path: ')
+file = input('File Path: ')
 extension = os.path.splitext(file)[1]
 filename = os.path.splitext(file)[0]
-pth=os.path.dirname(file)
-newfile=os.path.join(pth,filename+'_2'+extension)
-df=pd.read_excel(file)
-colpick=input('Select Column: ')
-cols=list(set(df[colpick].values))
+pth = os.path.dirname(file)
+newfile = os.path.join(pth, filename + '_2' + extension)
+df = pd.read_excel(file)
+colpick = input('Select Column: ')
+cols = list(set(df[colpick].values))
+
 
 def sendtofile(cols):
+    colpath = pth + "/" + colpick
+    if not os.path.exists(colpath):
+        os.makedirs(colpath)
     for i in cols:
-        df[df[colpick] == i].to_excel("{}/{}.xlsx".format(pth, i), sheet_name=i, index=False)
+        df[df[colpick] == i].to_excel(
+            "{}/{}.xlsx".format(colpath, i), sheet_name=i, index=False)
     print('\nCompleted')
     print('Thanks for using this program.')
     return
+
 
 def sendtosheet(cols):
     copyfile(file, newfile)
@@ -33,9 +39,12 @@ def sendtosheet(cols):
     print('Thanks for using this program.')
     return
 
-print('You data will split based on these values {} and create {} files or sheets based on next selection. If you are ready to proceed please type "Y" and hit enter. Hit "N" to exit.'.format(', '.join(cols),len(cols)))
+
+print(
+    'You data will split based on these values {} and create {} files or sheets based on next selection. If you are ready to proceed please type "Y" and hit enter. Hit "N" to exit.'
+    .format(', '.join(cols), len(cols)))
 while True:
-    x=input('Ready to Proceed (Y/N): ').lower()
+    x = input('Ready to Proceed (Y/N): ').lower()
     if x == 'y':
         while True:
             s = input('Split into different Sheets or File (S/F): ').lower()
@@ -45,11 +54,12 @@ while True:
             elif s == 's':
                 sendtosheet(cols)
                 break
-            else: continue
+            else:
+                continue
         break
-    elif x=='n':
+    elif x == 'n':
         print('\nThanks for using this program.')
         break
 
-    else: continue
-
+    else:
+        continue
