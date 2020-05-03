@@ -14,13 +14,15 @@ colpick = input('Select Column: ')
 cols = list(set(df[colpick].values))
 
 
-def sendtofile(cols):
+def sendtofile(cols, deleteCol):
     colpath = pth + "/" + colpick
     if not os.path.exists(colpath):
         os.makedirs(colpath)
     for i in cols:
         tempDf = df[df[colpick] == i]
-        tempDf = tempDf.drop(colpick, axis=1)
+        if deleteCol == 'y':
+            tempDf = tempDf.drop(colpick, axis=1)
+        tempDf = tempDf.sort_values(by=['Section'])
         tempDf.to_excel(
             "{}/{}.xlsx".format(colpath, i), sheet_name=i, index=False)
     print('\nCompleted')
@@ -50,8 +52,9 @@ while True:
     if x == 'y':
         while True:
             s = input('Split into different Sheets or File (S/F): ').lower()
+            deleteCol = input(f'Delete  the column {colpick} (Y/N): ').lower()
             if s == 'f':
-                sendtofile(cols)
+                sendtofile(cols,deleteCol)
                 break
             elif s == 's':
                 sendtosheet(cols)
