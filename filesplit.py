@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, NamedStyle
 import xlsxwriter
 from shutil import copyfile
 
@@ -13,6 +14,49 @@ df = pd.read_excel(file)
 colpick = input('Select Column: ')
 cols = list(set(df[colpick].values))
 
+alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+font = Font(name='Calibri',
+                 size=12,
+                 bold=False,
+                 italic=False,
+                 vertAlign=None,
+                 underline='none',
+                 strike=False,
+                 color='FF000000')
+fill = PatternFill(fill_type=None,
+                 start_color='FFFFFFFF',
+                 end_color='FF000000')
+border = Border(left=Side(border_style=None,
+                           color='FF000000'),
+                 right=Side(border_style=None,
+                            color='FF000000'),
+                 top=Side(border_style=None,
+                          color='FF000000'),
+                 bottom=Side(border_style=None,
+                             color='FF000000'),
+                 diagonal=Side(border_style=None,
+                               color='FF000000'),
+                 diagonal_direction=0,
+                 outline=Side(border_style=None,
+                              color='FF000000'),
+                 vertical=Side(border_style=None,
+                               color='FF000000'),
+                 horizontal=Side(border_style=None,
+                                color='FF000000')
+                )
+alignment=Alignment(horizontal='general',
+                     vertical='bottom',
+                     text_rotation=0,
+                     wrap_text=False,
+                     shrink_to_fit=False,
+                     indent=0)
+
+highlight = NamedStyle(name="highlight")
+bd = Side(style='thin', color="000000")
+
+highlight.font = font
+highlight.border = Border(left=bd,right=bd,top=bd,bottom=bd)
 
 def sendtofile(cols, deleteCol):
     colpath = pth + "/" + colpick
@@ -22,9 +66,19 @@ def sendtofile(cols, deleteCol):
         tempDf = df[df[colpick] == i]
         if deleteCol == 'y':
             tempDf = tempDf.drop(colpick, axis=1)
-        tempDf = tempDf.sort_values(by=['Section'])
-        tempDf.to_excel(
-            "{}/{}.xlsx".format(colpath, i), sheet_name=i, index=False)
+        tempDf = tempDf.sort_values(by=['Section', 'ID'])
+        tempFilePath ="{}/{}.xlsx".format(colpath, i) 
+        tempDf.to_excel(tempFilePath, sheet_name=i, index=False)
+        wb = load_workbook(tempFilePath)
+        wb.add_named_style(highlight)
+        ws = wb[i]
+        rows, columns = tempDf.shape
+        for c in range(columns):
+            for r in range(1,rows):
+                ws[f'{alphabet[c]}{r}'].style=highlight
+            
+        wb.save(tempFilePath)
+    
     print('\nCompleted')
     print('Thanks for using this program.')
     return
