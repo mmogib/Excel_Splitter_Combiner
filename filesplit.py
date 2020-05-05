@@ -74,7 +74,7 @@ def sendtofile(cols, deleteCol):
         ws = wb[i]
         rows, columns = tempDf.shape
         for c in range(columns):
-            for r in range(1,rows):
+            for r in range(1,rows+2):
                 ws[f'{alphabet[c]}{r}'].style=highlight
             
         wb.save(tempFilePath)
